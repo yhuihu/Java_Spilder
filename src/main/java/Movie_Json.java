@@ -6,8 +6,7 @@ import util.Download;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 
 public class Movie_Json {
     public static void main(String[] args) throws IOException {
@@ -17,8 +16,10 @@ public class Movie_Json {
             if (!file.mkdirs())
                 System.out.println("系统操作出现异常。");
         }
-        ExecutorService pool = Executors.newFixedThreadPool(10);
-        for (int i = 0; i < 10; i++) {
+//        ExecutorService pool = Executors.newFixedThreadPool(10);
+        ThreadPoolExecutor pool1 = new ThreadPoolExecutor(6,10,2, TimeUnit.MINUTES,new ArrayBlockingQueue<Runnable>(10));
+        pool1.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+        for (int i = 0; i < 100; i++) {
             String url = "https://movie.douban.com/j/search_subjects?type=movie&tag=%E8%B1%86%E7%93%A3%E9%AB%98%E5%88%86&sort=rank&page_limit=20&page_start=" + String.valueOf(i * 20);
             //尝试爬10页电影，按自己需求更改
             Connection.Response res = Jsoup.connect(url).ignoreContentType(true).execute();
@@ -31,9 +32,9 @@ public class Movie_Json {
                 //图片链接
                 //System.out.println(object.getString("cover"));
                 // 下载每张图片
-                pool.execute(new Download(object.getString("title"), object.getString("cover"),savePath));
+                pool1.execute(new Download(object.getString("title"), object.getString("cover"),savePath));
             }
         }
-        pool.shutdown();
+        pool1.shutdown();
     }
 }
