@@ -17,8 +17,9 @@ public class Book_Html {
         String savePath = "D:" + File.separator + "资源" + File.separator + "豆瓣图书" + File.separator;
         File file = new File(savePath);
         if (!file.exists()) {
-            if (!file.mkdirs())
+            if (!file.mkdirs()) {
                 System.out.println("系统操作出现异常。");
+            }
         }
         // 2 解析 html
         try {
